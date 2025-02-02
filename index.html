@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punjabi Alphabet Typing Practice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        #input-box {
+            padding: 10px;
+            font-size: 18px;
+            width: 300px;
+            margin-top: 20px;
+        }
+        #feedback {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .correct {
+            color: green;
+        }
+        .incorrect {
+            color: red;
+        }
+        #sample-word {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Type the Punjabi Alphabet in Order</h1>
+    <p>Type the letters of the Punjabi alphabet (Gurmukhi script) in the correct order:</p>
+    <input type="text" id="input-box" placeholder="Start typing here..." autofocus>
+    <div id="feedback"></div>
+    <div id="sample-word"></div>
+
+    <script>
+        // Punjabi alphabet in order
+        const punjabiAlphabet = [
+            'ੳ', 'ਅ', 'ੲ', 'ਸ', 'ਹ',
+            'ਕ', 'ਖ', 'ਗ', 'ਘ', 'ਙ',
+            'ਚ', 'ਛ', 'ਜ', 'ਝ', 'ਞ',
+            'ਟ', 'ਠ', 'ਡ', 'ਢ', 'ਣ',
+            'ਤ', 'ਥ', 'ਦ', 'ਧ', 'ਨ',
+            'ਪ', 'ਫ', 'ਬ', 'ਭ', 'ਮ',
+            'ਯ', 'ਰ', 'ਲ', 'ਵ', 'ੜ'
+        ];
+
+        // Sample words and their English translations
+        const sampleWords = [
+            { word: 'ਊਠ', translation: 'Camel' },
+            { word: 'ਅਨਾਰ', translation: 'Pomegranate' },
+            { word: 'ਇੱਟ', translation: 'Brick' },
+            { word: 'ਸੱਪ', translation: 'Snake' },
+            { word: 'ਹਾਥੀ', translation: 'Elephant' },
+            { word: 'ਕਬੂਤਰ', translation: 'Pigeon' },
+            { word: 'ਖਰਗੋਸ਼', translation: 'Rabbit' },
+            { word: 'ਗੇਂਦ', translation: 'Ball' },
+            { word: 'ਘੋੜਾ', translation: 'Horse' },
+            { word: 'ਙ', translation: '(No common word)' }, // Rare letter
+            { word: 'ਚਾਕੂ', translation: 'Knife' },
+            { word: 'ਛੱਤਰੀ', translation: 'Umbrella' },
+            { word: 'ਜਹਾਜ਼', translation: 'Ship' },
+            { word: 'ਝੰਡਾ', translation: 'Flag' },
+            { word: 'ਞ', translation: '(No common word)' }, // Rare letter
+            { word: 'ਟਮਾਟਰ', translation: 'Tomato' },
+            { word: 'ਠੇਲਾ', translation: 'Cart' },
+            { word: 'ਡੱਡੂ', translation: 'Frog' },
+            { word: 'ਢੋਲ', translation: 'Drum' },
+            { word: 'ਣ', translation: '(No common word)' }, // Rare letter
+            { word: 'ਤੋਤਾ', translation: 'Parrot' },
+            { word: 'ਥਾਲੀ', translation: 'Plate' },
+            { word: 'ਦਰਵਾਜ਼ਾ', translation: 'Door' },
+            { word: 'ਧੋਬੀ', translation: 'Washerman' },
+            { word: 'ਨਾਰੀਅਲ', translation: 'Coconut' },
+            { word: 'ਪਤੰਗ', translation: 'Kite' },
+            { word: 'ਫੁੱਲ', translation: 'Flower' },
+            { word: 'ਬੱਕਰੀ', translation: 'Goat' },
+            { word: 'ਭਾਲੂ', translation: 'Bear' },
+            { word: 'ਮੱਛੀ', translation: 'Fish' },
+            { word: 'ਯੱਕਾ', translation: 'Rickshaw' },
+            { word: 'ਰੱਸੀ', translation: 'Rope' },
+            { word: 'ਲੱਕੜ', translation: 'Wood' },
+            { word: 'ਵੱਛਾ', translation: 'Calf' },
+            { word: 'ੜ', translation: '(No common word)' } // Rare letter
+        ];
+
+        let currentIndex = 0;
+        const inputBox = document.getElementById('input-box');
+        const feedback = document.getElementById('feedback');
+        const sampleWordDiv = document.getElementById('sample-word');
+
+        // Initialize the Web Speech API
+        const synth = window.speechSynthesis;
+
+        function speakText(text) {
+            if (synth.speaking) {
+                console.error('SpeechSynthesis is already speaking.');
+                return;
+            }
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'pa-IN'; // Set language to Punjabi (India)
+            synth.speak(utterance);
+        }
+
+        inputBox.addEventListener('input', (event) => {
+            const userInput = event.target.value;
+
+            if (userInput === punjabiAlphabet[currentIndex]) {
+                feedback.textContent = 'Correct!';
+                feedback.className = 'correct';
+                // Display sample word and translation
+                sampleWordDiv.innerHTML = `
+                    <strong>Sample Word:</strong> ${sampleWords[currentIndex].word}<br>
+                    <strong>Translation:</strong> ${sampleWords[currentIndex].translation}
+                `;
+                // Speak the Punjabi word
+                speakText(sampleWords[currentIndex].word);
+                currentIndex++;
+                inputBox.value = ''; // Clear input box for the next letter
+
+                if (currentIndex === punjabiAlphabet.length) {
+                    feedback.textContent = 'Congratulations! You completed the Punjabi alphabet!';
+                    inputBox.disabled = true; // Disable input after completion
+                    sampleWordDiv.textContent = ''; // Clear sample word display
+                }
+            } else {
+                feedback.textContent = 'Incorrect, try again!';
+                feedback.className = 'incorrect';
+            }
+        });
+    </script>
+</body>
+</html>
