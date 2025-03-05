@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Blocks</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+        .block {
+            width: 100px;
+            height: 50px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            line-height: 50px;
+            margin: 10px;
+            cursor: grab;
+        }
+        .block:active {
+            cursor: grabbing;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="container"></div>
+<button id="showNextButton" class="hidden">Show Blocks 6 to 10</button>
+
+<script>
+    const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // Array of numbers
+    const container = document.getElementById('container');
+    const showNextButton = document.getElementById('showNextButton');
+    let draggedItem = null;
+
+    // Function to create blocks
+    function createBlocks(start, end) {
+        container.innerHTML = ''; // Clear existing blocks
+        for (let i = start; i <= end; i++) {
+            const block = document.createElement('div');
+            block.className = 'block';
+            block.draggable = true;
+            block.textContent = numbers[i - 1];
+            container.appendChild(block);
+        }
+    }
+
+    // Initialize first set of blocks (1 to 5)
+    createBlocks(1, 5);
+
+    // Drag and drop functionality
+    container.addEventListener('dragstart', (e) => {
+        draggedItem = e.target;
+        e.target.style.opacity = '0.4';
+    });
+
+    container.addEventListener('dragend', (e) => {
+        e.target.style.opacity = '1';
+        if (container.children.length === 5) showNextButton.classList.remove('hidden');
+    });
+
+    container.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(container, e.clientY);
+        if (afterElement == null) container.appendChild(draggedItem);
+        else container.insertBefore(draggedItem, afterElement);
+    });
+
+    // Function to calculate drop position
+    function getDragAfterElement(container, y) {
+        return [...container.querySelectorAll('.block:not(.dragging)')].reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            return offset < 0 && offset > closest.offset ? { offset, element: child } : closest;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // Show next set of blocks (6 to 10)
+    showNextButton.addEventListener('click', () => {
+        createBlocks(6, 10);
+        showNextButton.classList.add('hidden');
+    });
+</script>
+
+</body>
+</html>
