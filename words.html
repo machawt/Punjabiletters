@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+  <meta charset="UTF-8">
+  <title>Punjabi Word Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      background-color: #f9f9f9;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    #progress {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    #toggleTranslation {
+      margin-bottom: 1rem;
+      padding: 6px 12px;
+      font-size: 14px;
+      border: none;
+      background-color: #2196f3;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      grid-gap: 10px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .cell {
+      background-color: #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      height: 70px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+      user-select: none;
+      text-align: center;
+      padding: 4px;
+    }
+
+    .translation {
+      font-size: 12px;
+      color: #333;
+      margin-top: 2px;
+    }
+
+    .correct {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .wrong {
+      animation: shake 0.4s;
+      background-color: #f44336 !important;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+
+    @media (max-width: 500px) {
+      .cell {
+        font-size: 16px;
+        height: 60px;
+      }
+    }
+
+    #modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 10;
+    }
+
+    #modalContent {
+      background: white;
+      padding: 2rem;
+      text-align: center;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    #playAgain {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      background-color: #4caf50;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Punjabi Word Game</h1>
+<div id="progress"></div>
+<button id="toggleTranslation">Show English</button>
+<div id="grid"></div>
+
+<!-- Modal -->
+<div id="modal">
+  <div id="modalContent">
+    <h2>🎉 ਸ਼ਾਬਾਸ਼! You completed all words! 🎉</h2>
+    <button id="playAgain">🔁 Play Again</button>
+  </div>
+</div>
+
+<canvas id="confettiCanvas"></canvas>
+
+<script>
+  const punjabiAlphabet = [
+    'ਅ', 'ਆ', 'ਇ', 'ਈ', 'ਉ', 'ਊ', 'ਏ', 'ਐ', 'ਓ', 'ਔ',
+    'ਕ', 'ਖ', 'ਗ', 'ਘ', 'ਙ', 'ਚ', 'ਛ', 'ਜ', 'ਝ', 'ਞ',
+    'ਟ', 'ਠ', 'ਡ', 'ਢ', 'ਣ', 'ਤ', 'ਥ', 'ਦ', 'ਧ', 'ਨ',
+    'ਪ', 'ਫ', 'ਬ', 'ਭ', 'ਮ', 'ਯ', 'ਰ', 'ਲ', 'ਵ', 'ਸ਼',
+    'ਸ', 'ਹ', 'ਲ਼', 'ਖ਼', 'ਗ਼', 'ਜ਼', 'ਫ਼', 'ੜ'
+  ];
+
+  const punjabiWords = {
+    'ਅ': ['ਅਮਰ'], 'ਆ': ['ਆਮ'], 'ਇ': ['ਇਮਾਨਦਾਰ'], 'ਈ': ['ਈਰਖਾ'],
+    'ਉ': ['ਉਮੀਦ'], 'ਊ': ['ਊਠ'], 'ਏ': ['ਏਅਰਪੋਰਟ'], 'ਐ': ['ਐਨਕ'],
+    'ਓ': ['ਓਹਲੇ'], 'ਔ': ['ਔਰਤ'], 'ਕ': ['ਕਿਤਾਬ'], 'ਖ': ['ਖੇਡ'],
+    'ਗ': ['ਗੁਰਦੁਆਰਾ'], 'ਘ': ['ਘਰ'], 'ਙ': ['ਙਾੜਾ'], 'ਚ': ['ਚੰਨ'],
+    'ਛ': ['ਛੋਟਾ'], 'ਜ': ['ਜਹਾਜ਼'], 'ਝ': ['ਝੰਡਾ'], 'ਞ': ['ਪੰਜਾ'],
+    'ਟ': ['ਟਮਾਟਰ'], 'ਠ': ['ਠੇਲ੍ਹਾ'], 'ਡ': ['ਡਾਕ'], 'ਢ': ['ਢੋਲ'],
+    'ਣ': ['ਬਾਣੀ'], 'ਤ': ['ਤਿੰਨ'], 'ਥ': ['ਥਾਲੀ'], 'ਦ': ['ਦਿਲ'],
+    'ਧ': ['ਧਰਤੀ'], 'ਨ': ['ਨੌਕਰੀ'], 'ਪ': ['ਪਾਣੀ'], 'ਫ': ['ਫੁਲ'],
+    'ਬ': ['ਬੱਚਾ'], 'ਭ': ['ਭੁੱਖ'], 'ਮ': ['ਮਾਤਾ'], 'ਯ': ['ਯਾਤਰਾ'],
+    'ਰ': ['ਰੋਟੀ'], 'ਲ': ['ਲਹਿਜ਼ਾ'], 'ਵ': ['ਵਾਹਿਗੁਰੂ'], 'ਸ਼': ['ਸ਼ਬਦ'],
+    'ਸ': ['ਸਮਾਂ'], 'ਹ': ['ਹੱਸਣਾ'], 'ਲ਼': ['ਲ਼ਾੜੀ'], 'ਖ਼': ['ਖ਼ੁਦਾ'],
+    'ਗ਼': ['ਗ਼ਜ਼ਲ'], 'ਜ਼': ['ਜ਼ਿੰਦਗੀ'], 'ਫ਼': ['ਫ਼ੌਜ'], 'ੜ': ['ੜੱਕਾ']
+  };
+
+  const englishTranslations = {
+    'ਅਮਰ': 'Immortal', 'ਆਮ': 'Mango', 'ਇਮਾਨਦਾਰ': 'Honest', 'ਈਰਖਾ': 'Jealousy',
+    'ਉਮੀਦ': 'Hope', 'ਊਠ': 'Camel', 'ਏਅਰਪੋਰਟ': 'Airport', 'ਐਨਕ': 'Glasses',
+    'ਓਹਲੇ': 'Simple', 'ਔਰਤ': 'Woman', 'ਕਿਤਾਬ': 'Book', 'ਖੇਡ': 'Game',
+    'ਗੁਰਦੁਆਰਾ': 'Sikh temple', 'ਘਰ': 'Home', 'ਙਾੜਾ': 'Creak', 'ਚੰਨ': 'Moon',
+    'ਛੋਟਾ': 'Small', 'ਜਹਾਜ਼': 'Airplane', 'ਝੰਡਾ': 'Flag', 'ਪੰਜਾ': 'Claw',
+    'ਟਮਾਟਰ': 'Tomato', 'ਠੇਲ੍ਹਾ': 'Cart', 'ਡਾਕ': 'Mail', 'ਢੋਲ': 'Drum',
+    'ਬਾਣੀ': 'Sacred words', 'ਤਿੰਨ': 'Three', 'ਥਾਲੀ': 'Plate', 'ਦਿਲ': 'Heart',
+    'ਧਰਤੀ': 'Earth', 'ਨੌਕਰੀ': 'Job', 'ਪਾਣੀ': 'Water', 'ਫੁਲ': 'Flower',
+    'ਬੱਚਾ': 'Child', 'ਭੁੱਖ': 'Hunger', 'ਮਾਤਾ': 'Mother', 'ਯਾਤਰਾ': 'Journey',
+    'ਰੋਟੀ': 'Bread', 'ਲਹਿਜ਼ਾ': 'Accent', 'ਵਾਹਿਗੁਰੂ': 'God', 'ਸ਼ਬਦ': 'Word',
+    'ਸਮਾਂ': 'Time', 'ਹੱਸਣਾ': 'To laugh', 'ਲ਼ਾੜੀ': 'Doll', 'ਖ਼ੁਦਾ': 'God',
+    'ਗ਼ਜ਼ਲ': 'Poem', 'ਜ਼ਿੰਦਗੀ': 'Life', 'ਫ਼ੌਜ': 'Army', 'ੜੱਕਾ': 'Jolt'
+  };
+
+  let showEnglish = false;
+  let currentChunk = 0;
+  let expectedIndex = 0;
+  const chunkSize = 5;
+  const grid = document.getElementById('grid');
+  const modal = document.getElementById('modal');
+  const playAgainButton = document.getElementById('playAgain');
+  const toggleTranslation = document.getElementById('toggleTranslation');
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  let confetti = [];
+
+  function speakPunjabi(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = speechSynthesis.getVoices();
+    const paVoice = voices.find(v => v.lang.includes('pa') || v.lang.includes('hi'));
+    if (paVoice) utterance.voice = paVoice;
+    utterance.lang = "pa-IN";
+    speechSynthesis.speak(utterance);
+  }
+
+  function showChunk(index) {
+    grid.innerHTML = '';
+    expectedIndex = index * chunkSize;
+    const totalChunks = Math.ceil(punjabiAlphabet.length / chunkSize);
+    document.getElementById('progress').textContent = `Group ${index + 1} of ${totalChunks}`;
+
+    const chunkLetters = punjabiAlphabet.slice(expectedIndex, expectedIndex + chunkSize);
+    const displayWords = chunkLetters.map(letter => {
+      const words = punjabiWords[letter] || [];
+      const word = words.length > 0 ? words[0] : letter;
+      return { word, letter };
+    }).sort(() => Math.random() - 0.5);
+
+    displayWords.forEach(({ word, letter }) => {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.innerHTML = `<div>${word}</div>`;
+      if (showEnglish && englishTranslations[word]) {
+        cell.innerHTML += `<div class="translation">${englishTranslations[word]}</div>`;
+      }
+      cell.addEventListener('click', () => handleClick(cell, letter, word));
+      grid.appendChild(cell);
+    });
+  }
+
+  function handleClick(cell, letter, word) {
+    speakPunjabi(word);
+    if (letter === punjabiAlphabet[expectedIndex]) {
+      cell.classList.add('correct');
+      expectedIndex++;
+      if (expectedIndex % chunkSize === 0 || expectedIndex === punjabiAlphabet.length) {
+        if (expectedIndex >= punjabiAlphabet.length) {
+          setTimeout(() => showFinishEffect(), 400);
+        } else {
+          currentChunk++;
+          setTimeout(() => showChunk(currentChunk), 400);
+        }
+      }
+    } else {
+      [...grid.children].forEach(child => {
+        child.classList.remove('correct');
+        child.classList.add('wrong');
+      });
+      setTimeout(() => showChunk(currentChunk), 600);
+    }
+  }
+
+  toggleTranslation.onclick = () => {
+    showEnglish = !showEnglish;
+    toggleTranslation.textContent = showEnglish ? "Hide English" : "Show English";
+    showChunk(currentChunk);
+  };
+
+  playAgainButton.onclick = () => {
+    modal.style.display = 'none';
+    stopConfetti();
+    currentChunk = 0;
+    showChunk(currentChunk);
+  };
+
+  function showFinishEffect() {
+    modal.style.display = 'flex';
+    launchConfetti();
+  }
+
+  function launchConfetti() {
+    resizeCanvas();
+    confetti = [];
+    for (let i = 0; i < 150; i++) {
+      confetti.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 2,
+        d: Math.random() * 50 + 10,
+        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+        tilt: Math.random() * 10 - 10,
+        tiltAngle: 0,
+        tiltAngleIncrement: Math.random() * 0.1
+      });
+    }
+    animateConfetti();
+  }
+
+  function animateConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confetti.forEach(c => {
+      ctx.beginPath();
+      ctx.lineWidth = c.r;
+      ctx.strokeStyle = c.color;
+      ctx.moveTo(c.x + c.tilt, c.y);
+      ctx.lineTo(c.x, c.y + c.tilt + c.r);
+      ctx.stroke();
+      c.y += Math.cos(c.d) + 2;
+      c.tiltAngle += c.tiltAngleIncrement;
+      c.tilt = Math.sin(c.tiltAngle) * 10;
+      if (c.y > canvas.height) {
+        c.y = -10;
+        c.x = Math.random() * canvas.width;
+      }
+    });
+    requestAnimationFrame(animateConfetti);
+  }
+
+  function stopConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+  window.speechSynthesis.onvoiceschanged = () => {};
+  showChunk(currentChunk);
+</script>
+
+</body>
+</html>
