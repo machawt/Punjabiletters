@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Punjabi Alphabet Game - 5 Letters at a Time</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      background-color: #f9f9f9;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      grid-gap: 10px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .cell {
+      background-color: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      height: 60px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+      user-select: none;
+    }
+
+    .correct {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .wrong {
+      animation: shake 0.4s;
+      background-color: #f44336 !important;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+
+    @media (max-width: 500px) {
+      .cell {
+        font-size: 20px;
+        height: 50px;
+      }
+    }
+
+    /* Modal styles */
+    #modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 10;
+    }
+
+    #modalContent {
+      background: white;
+      padding: 2rem;
+      text-align: center;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    #modal h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    #playAgain {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      background-color: #4caf50;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Click 5 Punjabi Letters in Order</h1>
+<div id="grid"></div>
+
+<!-- Modal Popup -->
+<div id="modal">
+  <div id="modalContent">
+    <h2>🎉 ਸ਼ਾਬਾਸ਼! You finished the alphabet! 🎉</h2>
+    <button id="playAgain">🔁 Play Again</button>
+  </div>
+</div>
+
+<canvas id="confettiCanvas"></canvas>
+
+<script>
+  const punjabiAlphabet = [
+    'ਅ', 'ਆ', 'ਇ', 'ਈ', 'ਉ', 'ਊ', 'ਏ', 'ਐ', 'ਓ', 'ਔ',
+    'ਕ', 'ਖ', 'ਗ', 'ਘ', 'ਙ', 'ਚ', 'ਛ', 'ਜ', 'ਝ', 'ਞ',
+    'ਟ', 'ਠ', 'ਡ', 'ਢ', 'ਣ', 'ਤ', 'ਥ', 'ਦ', 'ਧ', 'ਨ',
+    'ਪ', 'ਫ', 'ਬ', 'ਭ', 'ਮ', 'ਯ', 'ਰ', 'ਲ', 'ਵ', 'ਸ਼',
+    'ਸ', 'ਹ', 'ਲ਼', 'ਖ਼', 'ਗ਼', 'ਜ਼', 'ਫ਼', 'ੜ'
+  ];
+
+  let currentChunk = 0;
+  let expectedIndex = 0;
+  const chunkSize = 5;
+  const grid = document.getElementById('grid');
+  const modal = document.getElementById('modal');
+  const playAgainButton = document.getElementById('playAgain');
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  let confetti = [];
+
+  function speakPunjabi(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = speechSynthesis.getVoices();
+    const punjabiVoice = voices.find(v => v.lang.includes('pa') || v.lang.includes('hi') || v.name.includes("Punjabi"));
+    if (punjabiVoice) utterance.voice = punjabiVoice;
+    utterance.lang = "pa-IN";
+    speechSynthesis.speak(utterance);
+  }
+
+  function showChunk(index) {
+    grid.innerHTML = '';
+    expectedIndex = index * chunkSize;
+    const chunk = punjabiAlphabet.slice(expectedIndex, expectedIndex + chunkSize);
+    const shuffled = chunk.slice().sort(() => Math.random() - 0.5);
+    shuffled.forEach(letter => {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.textContent = letter;
+      cell.addEventListener('click', () => handleClick(cell, letter));
+      grid.appendChild(cell);
+    });
+  }
+
+  function handleClick(cell, letter) {
+    speakPunjabi(letter);
+    if (letter === punjabiAlphabet[expectedIndex]) {
+      cell.classList.add('correct');
+      expectedIndex++;
+      if ((expectedIndex) % chunkSize === 0 || expectedIndex === punjabiAlphabet.length) {
+        if (expectedIndex >= punjabiAlphabet.length) {
+          setTimeout(() => showFinishEffect(), 400);
+        } else {
+          currentChunk++;
+          setTimeout(() => showChunk(currentChunk), 400);
+        }
+      }
+    } else {
+      [...grid.children].forEach(child => {
+        child.classList.remove('correct');
+        child.classList.add('wrong');
+      });
+      setTimeout(() => showChunk(currentChunk), 600);
+    }
+  }
+
+  function showFinishEffect() {
+    modal.style.display = 'flex';
+    launchConfetti();
+  }
+
+  playAgainButton.onclick = () => {
+    modal.style.display = 'none';
+    stopConfetti();
+    currentChunk = 0;
+    showChunk(currentChunk);
+  };
+
+  // Confetti code
+  function launchConfetti() {
+    resizeCanvas();
+    confetti = [];
+    for (let i = 0; i < 150; i++) {
+      confetti.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 2,
+        d: Math.random() * 50 + 10,
+        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+        tilt: Math.random() * 10 - 10,
+        tiltAngle: 0,
+        tiltAngleIncrement: Math.random() * 0.1
+      });
+    }
+    animateConfetti();
+  }
+
+  function animateConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confetti.forEach(c => {
+      ctx.beginPath();
+      ctx.lineWidth = c.r;
+      ctx.strokeStyle = c.color;
+      ctx.moveTo(c.x + c.tilt, c.y);
+      ctx.lineTo(c.x, c.y + c.tilt + c.r);
+      ctx.stroke();
+      c.y += Math.cos(c.d) + 2;
+      c.tiltAngle += c.tiltAngleIncrement;
+      c.tilt = Math.sin(c.tiltAngle) * 10;
+      if (c.y > canvas.height) {
+        c.y = -10;
+        c.x = Math.random() * canvas.width;
+      }
+    });
+    confettiAnimation = requestAnimationFrame(animateConfetti);
+  }
+
+  function stopConfetti() {
+    cancelAnimationFrame(confettiAnimation);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+  window.speechSynthesis.onvoiceschanged = () => {};
+  showChunk(currentChunk);
+</script>
+
+</body>
+</html>
