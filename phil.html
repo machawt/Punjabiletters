@@ -239,7 +239,7 @@
     }
 
     function handleClick(wordObj, btn) {
-      speakWord(wordObj.pa); // ← New: Speak clicked word
+      speakWord(wordObj.pa);
 
       if (wordObj.pa === correctWords[clickedIndex].pa) {
         btn.style.backgroundColor = "green";
@@ -268,13 +268,17 @@
 
     function speakWord(word) {
       const utterance = new SpeechSynthesisUtterance(word);
-      utterance.lang = 'pa-IN';
+      const voices = speechSynthesis.getVoices();
+      utterance.voice = voices.find(v => v.lang.includes("hi") || v.name.includes("Google")) || null;
+      utterance.lang = 'hi-IN';
       speechSynthesis.speak(utterance);
     }
 
     function speakVerse(text) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'pa-IN';
+      const voices = speechSynthesis.getVoices();
+      utterance.voice = voices.find(v => v.lang.includes("hi") || v.name.includes("Google")) || null;
+      utterance.lang = 'hi-IN';
       speechSynthesis.speak(utterance);
     }
 
@@ -303,8 +307,10 @@
       });
     });
 
-    // Start the game
-    showVerse(currentVerse);
+    // Ensure voices are loaded before starting
+    window.speechSynthesis.onvoiceschanged = () => {
+      showVerse(currentVerse);
+    };
   </script>
 </body>
 </html>
