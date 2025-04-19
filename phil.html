@@ -34,6 +34,28 @@
       cursor: pointer;
       transition: background 0.2s;
     }
+    #navigation {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.nav-button {
+  padding: 10px 15px;
+  font-size: 1.1em;
+  margin: 0 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.nav-button:hover {
+  background-color: #0056b3;
+}
+
     .word-button:hover {
       background-color: #0056b3;
     }
@@ -56,6 +78,11 @@
 </head>
 <body>
   <h1>Philippians 1:1–5 in Punjabi</h1>
+  <div id="navigation">
+  <button id="backBtn" class="nav-button">← Previous</button>
+  <button id="forwardBtn" class="nav-button">Next →</button>
+</div>
+
   <div id="game"></div>
   <div id="message"></div>
   <div id="completion">🎉 ਸ਼ਾਬਾਸ਼! ਤੁਸੀਂ ਮੁਕੰਮਲ ਕੀਤਾ ਹੈ! 🎉</div>
@@ -94,6 +121,49 @@
         game.appendChild(btn);
       });
     }
+const backBtn = document.getElementById('backBtn');
+const forwardBtn = document.getElementById('forwardBtn');
+
+backBtn.onclick = () => {
+  if (currentVerse > 0) {
+    currentVerse--;
+    showVerse(currentVerse);
+  }
+};
+
+forwardBtn.onclick = () => {
+  if (currentVerse < verses.length - 1) {
+    currentVerse++;
+    showVerse(currentVerse);
+  }
+};
+
+// Disable or enable navigation buttons based on the current verse
+function updateNavigation() {
+  backBtn.disabled = currentVerse === 0;
+  forwardBtn.disabled = currentVerse === verses.length - 1;
+}
+
+// Call updateNavigation after displaying each verse
+function showVerse(index) {
+  const verse = verses[index];
+  correctWords = verse.split(" ");
+  clickedIndex = 0;
+  const shuffled = shuffle([...correctWords]);
+  const game = document.getElementById("game");
+  game.innerHTML = "";
+  document.getElementById("message").textContent = "";
+
+  shuffled.forEach(word => {
+    const btn = document.createElement("button");
+    btn.textContent = word;
+    btn.className = "word-button";
+    btn.onclick = () => handleClick(word, btn);
+    game.appendChild(btn);
+  });
+
+  updateNavigation();
+}
 
     function handleClick(word, btn) {
       if (word === correctWords[clickedIndex]) {
