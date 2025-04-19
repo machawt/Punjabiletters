@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Philippians 1:1-5 Challenge</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1em;
+      background: linear-gradient(to bottom right, #f0f8ff, #e6f7ff);
+      min-height: 100vh;
+    }
+    h1 {
+      font-size: 1.5em;
+      text-align: center;
+    }
+    #game {
+      max-width: 600px;
+      width: 100%;
+      margin-top: 1em;
+    }
+    .word-button {
+      padding: 10px 14px;
+      margin: 5px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .word-button:hover {
+      background-color: #0056b3;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: green;
+    }
+    #completion {
+      display: none;
+      font-size: 2em;
+      color: darkblue;
+      animation: fadeIn 2s ease-in-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Philippians 1:1–5 in Greek</h1>
+  <div id="game"></div>
+  <div id="message"></div>
+  <div id="completion">🎉 ΣΥΓΧΑΡΗΤΗΡΙΑ! ΕΧΕΤΕ ΟΛΟΚΛΗΡΩΣΕΙ! 🎉</div>
+
+  <script>
+    const verses = [
+      "Παῦλος καὶ Τιμόθεος δοῦλοι Χριστοῦ Ἰησοῦ πᾶσιν τοῖς ἁγίοις ἐν Χριστῷ Ἰησοῦ τοῖς οὖσιν ἐν Φιλίπποις σὺν ἐπισκόποις καὶ διακόνοις",
+      "χάρις ὑμῖν καὶ εἰρήνη ἀπὸ Θεοῦ Πατρὸς ἡμῶν καὶ Κυρίου Ἰησοῦ Χριστοῦ",
+      "Εὐχαριστῶ τῷ Θεῷ μου ἐπὶ πάσῃ τῇ μνείᾳ ὑμῶν",
+      "πάντοτε ἐν πάσῃ δεήσει μου ὑπὲρ πάντων ὑμῶν μετὰ χαρᾶς τὴν δέησιν ποιούμενος",
+      "ἐπὶ τῇ κοινωνίᾳ ὑμῶν εἰς τὸ εὐαγγέλιον ἀπὸ τῆς πρώτης ἡμέρας ἄχρι τοῦ νῦν"
+    ];
+
+    let currentVerse = 0;
+    let correctWords = [];
+    let clickedIndex = 0;
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function showVerse(index) {
+      const verse = verses[index];
+      correctWords = verse.split(" ");
+      clickedIndex = 0;
+      const shuffled = shuffle([...correctWords]);
+      const game = document.getElementById("game");
+      game.innerHTML = "";
+      document.getElementById("message").textContent = "";
+
+      shuffled.forEach(word => {
+        const btn = document.createElement("button");
+        btn.textContent = word;
+        btn.className = "word-button";
+        btn.onclick = () => handleClick(word, btn);
+        game.appendChild(btn);
+      });
+    }
+
+    function handleClick(word, btn) {
+      if (word === correctWords[clickedIndex]) {
+        btn.style.backgroundColor = "green";
+        btn.disabled = true;
+        clickedIndex++;
+        if (clickedIndex === correctWords.length) {
+          document.getElementById("message").textContent = "✅ Σωστά!";
+          setTimeout(() => {
+            currentVerse++;
+            if (currentVerse < verses.length) {
+              showVerse(currentVerse);
+            } else {
+              document.getElementById("game").style.display = "none";
+              document.getElementById("message").style.display = "none";
+              document.getElementById("completion").style.display = "block";
+            }
+          }, 1500);
+        }
+      } else {
+        btn.style.backgroundColor = "red";
+        setTimeout(() => btn.style.backgroundColor = "#007bff", 500);
+      }
+    }
+
+    // Start the game
+    showVerse(currentVerse);
+  </script>
+</body>
+</html>
