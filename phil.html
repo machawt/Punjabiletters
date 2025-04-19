@@ -1,61 +1,46 @@
 <!DOCTYPE html>
 <html lang="pa">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Philippians 1:1-5 Challenge (Punjabi)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Philippians 1:1–5 (Punjabi Word Game)</title>
   <style>
     body {
       font-family: sans-serif;
+      background: linear-gradient(to bottom right, #f0f8ff, #e6f7ff);
+      padding: 1em;
+      text-align: center;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 1em;
-      background: linear-gradient(to bottom right, #f0f8ff, #e6f7ff);
-      min-height: 100vh;
     }
     h1 {
       font-size: 1.5em;
-      text-align: center;
+      margin-bottom: 0.5em;
     }
     #game {
       max-width: 600px;
       width: 100%;
       margin-top: 1em;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
     }
     .word-button {
       padding: 10px 14px;
-      margin: 5px;
+      margin: 6px;
       font-size: 1.1em;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       background-color: #007bff;
       color: white;
       cursor: pointer;
       transition: background 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    #navigation {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.nav-button {
-  padding: 10px 15px;
-  font-size: 1.1em;
-  margin: 0 10px;
-  border: none;
-  border-radius: 8px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.nav-button:hover {
-  background-color: #0056b3;
-}
-
     .word-button:hover {
       background-color: #0056b3;
     }
@@ -70,30 +55,147 @@
       color: darkblue;
       animation: fadeIn 2s ease-in-out forwards;
     }
+    #navigation {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      gap: 1em;
+    }
+    .nav-button {
+      padding: 10px 15px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .nav-button:hover {
+      background-color: #0056b3;
+    }
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
+    label {
+      margin-top: 1em;
+      font-size: 1em;
+    }
   </style>
 </head>
 <body>
+
   <h1>Philippians 1:1–5 in Punjabi</h1>
-  <div id="navigation">
-  <button id="backBtn" class="nav-button">← Previous</button>
-  <button id="forwardBtn" class="nav-button">Next →</button>
-</div>
+
+  <label>
+    <input type="checkbox" id="toggleTranslation" />
+    Show English Translation
+  </label>
 
   <div id="game"></div>
   <div id="message"></div>
   <div id="completion">🎉 ਸ਼ਾਬਾਸ਼! ਤੁਸੀਂ ਮੁਕੰਮਲ ਕੀਤਾ ਹੈ! 🎉</div>
 
+  <div id="navigation">
+    <button id="backBtn" class="nav-button">← Previous</button>
+    <button id="forwardBtn" class="nav-button">Next →</button>
+  </div>
+
   <script>
     const verses = [
-      "ਪਾਵਲੁਸ ਅਤੇ ਤਿਮਥੀਯੁਸ, ਈਸਾ ਮਸੀਹ ਦੇ ਦਾਸ, ਸਾਰੇ ਪਵਿੱਤਰਾਂ ਦੇ ਨਾਲ ਜਿਨ੍ਹਾਂ ਨੇ ਈਸਾ ਮਸੀਹ ਵਿੱਚ ਫਿਲਿੱਪੀਆਂ ਵਿੱਚ ਰਹਿਣਾ ਹੈ, ਅਤੇ ਪੇਸ਼ਵਾਂ ਅਤੇ ਸੇਵਕਾਂ ਨਾਲ",
-      "ਖ਼ੁਦਾ ਦੇ ਪਿਤਾ ਅਤੇ ਸਾਡੀ ਰੱਬੀ ਈਸਾ ਮਸੀਹ ਦੇ ਵੱਲੋਂ ਤੁਹਾਨੂੰ ਕਿਰਪਾ ਅਤੇ ਸ਼ਾਂਤੀ ਮਿਲੇ",
-      "ਮੈਂ ਹਮੇਸ਼ਾਂ ਤੁਹਾਡੀ ਯਾਦ ਵਿੱਚ ਖ਼ੁਦਾ ਦਾ ਧੰਨਵਾਦ ਕਰਦਾ ਹਾਂ",
-      "ਹਮੇਸ਼ਾਂ ਹਰ ਇੱਕ ਪ੍ਰਾਰਥਨਾ ਵਿੱਚ ਮੈਂ ਸਾਰੇ ਤੁਸੀਂ ਲਈ ਖ਼ੁਸ਼ੀ ਨਾਲ ਪ੍ਰਾਰਥਨਾ ਕਰਦਾ ਹਾਂ",
-      "ਤੁਹਾਡੇ ਖ਼ੁਦਾਈ ਦੇ ਸੁਨੇਹੇ ਨਾਲ ਸਾਂਝੇਦਾਰੀ ਵਿੱਚ, ਪਹਿਲੀ ਦਿਨ ਤੋਂ ਅਜੇ ਤੱਕ"
+      {
+        words: [
+          { pa: "ਪਾਵਲੁਸ", en: "Paul" },
+          { pa: "ਅਤੇ", en: "and" },
+          { pa: "ਤਿਮਥੀਯੁਸ", en: "Timothy" },
+          { pa: "ਈਸਾ", en: "Jesus" },
+          { pa: "ਮਸੀਹ", en: "Christ" },
+          { pa: "ਦੇ", en: "of" },
+          { pa: "ਦਾਸ", en: "servants" },
+          { pa: "ਸਾਰੇ", en: "all" },
+          { pa: "ਪਵਿੱਤਰਾਂ", en: "holy people" },
+          { pa: "ਦੇ", en: "of" },
+          { pa: "ਨਾਲ", en: "with" },
+          { pa: "ਜਿਨ੍ਹਾਂ", en: "who" },
+          { pa: "ਨੇ", en: "have" },
+          { pa: "ਵਿੱਚ", en: "in" },
+          { pa: "ਫਿਲਿੱਪੀਆਂ", en: "Philippi" },
+          { pa: "ਰਹਿਣਾ", en: "live" },
+          { pa: "ਹੈ", en: "are" },
+          { pa: "ਪੇਸ਼ਵਾਂ", en: "overseers" },
+          { pa: "ਅਤੇ", en: "and" },
+          { pa: "ਸੇਵਕਾਂ", en: "deacons" },
+          { pa: "ਨਾਲ", en: "with" }
+        ]
+      },
+      {
+        words: [
+          { pa: "ਖ਼ੁਦਾ", en: "God" },
+          { pa: "ਦੇ", en: "of" },
+          { pa: "ਪਿਤਾ", en: "Father" },
+          { pa: "ਅਤੇ", en: "and" },
+          { pa: "ਸਾਡੀ", en: "our" },
+          { pa: "ਰੱਬੀ", en: "Lord" },
+          { pa: "ਈਸਾ", en: "Jesus" },
+          { pa: "ਮਸੀਹ", en: "Christ" },
+          { pa: "ਦੇ", en: "of" },
+          { pa: "ਵੱਲੋਂ", en: "from" },
+          { pa: "ਤੁਹਾਨੂੰ", en: "to you" },
+          { pa: "ਕਿਰਪਾ", en: "grace" },
+          { pa: "ਅਤੇ", en: "and" },
+          { pa: "ਸ਼ਾਂਤੀ", en: "peace" },
+          { pa: "ਮਿਲੇ", en: "be to you" }
+        ]
+      },
+      {
+        words: [
+          { pa: "ਮੈਂ", en: "I" },
+          { pa: "ਹਮੇਸ਼ਾਂ", en: "always" },
+          { pa: "ਤੁਹਾਡੀ", en: "your" },
+          { pa: "ਯਾਦ", en: "remembrance" },
+          { pa: "ਵਿੱਚ", en: "in" },
+          { pa: "ਖ਼ੁਦਾ", en: "God" },
+          { pa: "ਦਾ", en: "of" },
+          { pa: "ਧੰਨਵਾਦ", en: "thank" },
+          { pa: "ਕਰਦਾ", en: "do" },
+          { pa: "ਹਾਂ", en: "am" }
+        ]
+      },
+      {
+        words: [
+          { pa: "ਹਮੇਸ਼ਾਂ", en: "always" },
+          { pa: "ਹਰ", en: "every" },
+          { pa: "ਇੱਕ", en: "one" },
+          { pa: "ਪ੍ਰਾਰਥਨਾ", en: "prayer" },
+          { pa: "ਵਿੱਚ", en: "in" },
+          { pa: "ਮੈਂ", en: "I" },
+          { pa: "ਸਾਰੇ", en: "all" },
+          { pa: "ਤੁਸੀਂ", en: "you" },
+          { pa: "ਲਈ", en: "for" },
+          { pa: "ਖ਼ੁਸ਼ੀ", en: "joy" },
+          { pa: "ਨਾਲ", en: "with" },
+          { pa: "ਪ੍ਰਾਰਥਨਾ", en: "pray" },
+          { pa: "ਕਰਦਾ", en: "do" },
+          { pa: "ਹਾਂ", en: "am" }
+        ]
+      },
+      {
+        words: [
+          { pa: "ਤੁਹਾਡੇ", en: "your" },
+          { pa: "ਖ਼ੁਦਾਈ", en: "gospel" },
+          { pa: "ਦੇ", en: "of" },
+          { pa: "ਸੁਨੇਹੇ", en: "message" },
+          { pa: "ਨਾਲ", en: "with" },
+          { pa: "ਸਾਂਝੇਦਾਰੀ", en: "partnership" },
+          { pa: "ਵਿੱਚ", en: "in" },
+          { pa: "ਪਹਿਲੀ", en: "first" },
+          { pa: "ਦਿਨ", en: "day" },
+          { pa: "ਤੋਂ", en: "from" },
+          { pa: "ਅਜੇ", en: "until" },
+          { pa: "ਤੱਕ", en: "now" }
+        ]
+      }
     ];
 
     let currentVerse = 0;
@@ -106,73 +208,46 @@
 
     function showVerse(index) {
       const verse = verses[index];
-      correctWords = verse.split(" ");
+      correctWords = verse.words;
       clickedIndex = 0;
       const shuffled = shuffle([...correctWords]);
       const game = document.getElementById("game");
       game.innerHTML = "";
       document.getElementById("message").textContent = "";
 
-      shuffled.forEach(word => {
+      shuffled.forEach(wordObj => {
         const btn = document.createElement("button");
-        btn.textContent = word;
         btn.className = "word-button";
-        btn.onclick = () => handleClick(word, btn);
+        btn.onclick = () => handleClick(wordObj, btn);
+
+        const paSpan = document.createElement("span");
+        paSpan.textContent = wordObj.pa;
+
+        const enSpan = document.createElement("div");
+        enSpan.className = "en-translation";
+        enSpan.style.fontSize = "0.8em";
+        enSpan.style.color = "#ffebcd";
+        enSpan.style.display = document.getElementById("toggleTranslation").checked ? "block" : "none";
+        enSpan.textContent = wordObj.en;
+
+        btn.appendChild(paSpan);
+        btn.appendChild(enSpan);
         game.appendChild(btn);
       });
+
+      updateNavigation();
     }
-const backBtn = document.getElementById('backBtn');
-const forwardBtn = document.getElementById('forwardBtn');
 
-backBtn.onclick = () => {
-  if (currentVerse > 0) {
-    currentVerse--;
-    showVerse(currentVerse);
-  }
-};
+    function handleClick(wordObj, btn) {
+      speakWord(wordObj.pa); // ← New: Speak clicked word
 
-forwardBtn.onclick = () => {
-  if (currentVerse < verses.length - 1) {
-    currentVerse++;
-    showVerse(currentVerse);
-  }
-};
-
-// Disable or enable navigation buttons based on the current verse
-function updateNavigation() {
-  backBtn.disabled = currentVerse === 0;
-  forwardBtn.disabled = currentVerse === verses.length - 1;
-}
-
-// Call updateNavigation after displaying each verse
-function showVerse(index) {
-  const verse = verses[index];
-  correctWords = verse.split(" ");
-  clickedIndex = 0;
-  const shuffled = shuffle([...correctWords]);
-  const game = document.getElementById("game");
-  game.innerHTML = "";
-  document.getElementById("message").textContent = "";
-
-  shuffled.forEach(word => {
-    const btn = document.createElement("button");
-    btn.textContent = word;
-    btn.className = "word-button";
-    btn.onclick = () => handleClick(word, btn);
-    game.appendChild(btn);
-  });
-
-  updateNavigation();
-}
-
-    function handleClick(word, btn) {
-      if (word === correctWords[clickedIndex]) {
+      if (wordObj.pa === correctWords[clickedIndex].pa) {
         btn.style.backgroundColor = "green";
         btn.disabled = true;
         clickedIndex++;
         if (clickedIndex === correctWords.length) {
           document.getElementById("message").textContent = "✅ ਸਹੀ!";
-          speakVerse(verses[currentVerse]);
+          speakVerse(correctWords.map(w => w.pa).join(" "));
           setTimeout(() => {
             currentVerse++;
             if (currentVerse < verses.length) {
@@ -180,6 +255,7 @@ function showVerse(index) {
             } else {
               document.getElementById("game").style.display = "none";
               document.getElementById("message").style.display = "none";
+              document.getElementById("navigation").style.display = "none";
               document.getElementById("completion").style.display = "block";
             }
           }, 3000);
@@ -190,11 +266,42 @@ function showVerse(index) {
       }
     }
 
-    function speakVerse(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'pa-IN'; // Punjabi language code
+    function speakWord(word) {
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = 'pa-IN';
       speechSynthesis.speak(utterance);
     }
+
+    function speakVerse(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'pa-IN';
+      speechSynthesis.speak(utterance);
+    }
+
+    function updateNavigation() {
+      document.getElementById("backBtn").disabled = currentVerse === 0;
+      document.getElementById("forwardBtn").disabled = currentVerse === verses.length - 1;
+    }
+
+    document.getElementById("backBtn").onclick = () => {
+      if (currentVerse > 0) {
+        currentVerse--;
+        showVerse(currentVerse);
+      }
+    };
+
+    document.getElementById("forwardBtn").onclick = () => {
+      if (currentVerse < verses.length - 1) {
+        currentVerse++;
+        showVerse(currentVerse);
+      }
+    };
+
+    document.getElementById("toggleTranslation").addEventListener("change", () => {
+      document.querySelectorAll(".en-translation").forEach(span => {
+        span.style.display = document.getElementById("toggleTranslation").checked ? "block" : "none";
+      });
+    });
 
     // Start the game
     showVerse(currentVerse);
