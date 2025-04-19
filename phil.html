@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Philippians 1:1-5 Challenge (Punjabi)</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1em;
+      background: linear-gradient(to bottom right, #f0f8ff, #e6f7ff);
+      min-height: 100vh;
+    }
+    h1 {
+      font-size: 1.5em;
+      text-align: center;
+    }
+    #game {
+      max-width: 600px;
+      width: 100%;
+      margin-top: 1em;
+    }
+    .word-button {
+      padding: 10px 14px;
+      margin: 5px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .word-button:hover {
+      background-color: #0056b3;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: green;
+    }
+    #completion {
+      display: none;
+      font-size: 2em;
+      color: darkblue;
+      animation: fadeIn 2s ease-in-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Philippians 1:1–5 in Punjabi</h1>
+  <div id="game"></div>
+  <div id="message"></div>
+  <div id="completion">🎉 ਸ਼ਾਬਾਸ਼! ਤੁਸੀਂ ਮੁਕੰਮਲ ਕੀਤਾ ਹੈ! 🎉</div>
+
+  <script>
+    const verses = [
+      "ਪਾਵਲੁਸ ਅਤੇ ਤਿਮਥੀਯੁਸ, ਈਸਾ ਮਸੀਹ ਦੇ ਦਾਸ, ਸਾਰੇ ਪਵਿੱਤਰਾਂ ਦੇ ਨਾਲ ਜਿਨ੍ਹਾਂ ਨੇ ਈਸਾ ਮਸੀਹ ਵਿੱਚ ਫਿਲਿੱਪੀਆਂ ਵਿੱਚ ਰਹਿਣਾ ਹੈ, ਅਤੇ ਪੇਸ਼ਵਾਂ ਅਤੇ ਸੇਵਕਾਂ ਨਾਲ",
+      "ਖ਼ੁਦਾ ਦੇ ਪਿਤਾ ਅਤੇ ਸਾਡੀ ਰੱਬੀ ਈਸਾ ਮਸੀਹ ਦੇ ਵੱਲੋਂ ਤੁਹਾਨੂੰ ਕਿਰਪਾ ਅਤੇ ਸ਼ਾਂਤੀ ਮਿਲੇ",
+      "ਮੈਂ ਹਮੇਸ਼ਾਂ ਤੁਹਾਡੀ ਯਾਦ ਵਿੱਚ ਖ਼ੁਦਾ ਦਾ ਧੰਨਵਾਦ ਕਰਦਾ ਹਾਂ",
+      "ਹਮੇਸ਼ਾਂ ਹਰ ਇੱਕ ਪ੍ਰਾਰਥਨਾ ਵਿੱਚ ਮੈਂ ਸਾਰੇ ਤੁਸੀਂ ਲਈ ਖ਼ੁਸ਼ੀ ਨਾਲ ਪ੍ਰਾਰਥਨਾ ਕਰਦਾ ਹਾਂ",
+      "ਤੁਹਾਡੇ ਖ਼ੁਦਾਈ ਦੇ ਸੁਨੇਹੇ ਨਾਲ ਸਾਂਝੇਦਾਰੀ ਵਿੱਚ, ਪਹਿਲੀ ਦਿਨ ਤੋਂ ਅਜੇ ਤੱਕ"
+    ];
+
+    let currentVerse = 0;
+    let correctWords = [];
+    let clickedIndex = 0;
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function showVerse(index) {
+      const verse = verses[index];
+      correctWords = verse.split(" ");
+      clickedIndex = 0;
+      const shuffled = shuffle([...correctWords]);
+      const game = document.getElementById("game");
+      game.innerHTML = "";
+      document.getElementById("message").textContent = "";
+
+      shuffled.forEach(word => {
+        const btn = document.createElement("button");
+        btn.textContent = word;
+        btn.className = "word-button";
+        btn.onclick = () => handleClick(word, btn);
+        game.appendChild(btn);
+      });
+    }
+
+    function handleClick(word, btn) {
+      if (word === correctWords[clickedIndex]) {
+        btn.style.backgroundColor = "green";
+        btn.disabled = true;
+        clickedIndex++;
+        if (clickedIndex === correctWords.length) {
+          document.getElementById("message").textContent = "✅ ਸਹੀ!";
+          speakVerse(verses[currentVerse]);
+          setTimeout(() => {
+            currentVerse++;
+            if (currentVerse < verses.length) {
+              showVerse(currentVerse);
+            } else {
+              document.getElementById("game").style.display = "none";
+              document.getElementById("message").style.display = "none";
+              document.getElementById("completion").style.display = "block";
+            }
+          }, 3000);
+        }
+      } else {
+        btn.style.backgroundColor = "red";
+        setTimeout(() => btn.style.backgroundColor = "#007bff", 500);
+      }
+    }
+
+    function speakVerse(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'pa-IN'; // Punjabi language code
+      speechSynthesis.speak(utterance);
+    }
+
+    // Start the game
+    showVerse(currentVerse);
+  </script>
+</body>
+</html>
