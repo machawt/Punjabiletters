@@ -102,6 +102,7 @@
         clickedIndex++;
         if (clickedIndex === correctWords.length) {
           document.getElementById("message").textContent = "✅ Σωστά!";
+          speakVerse(verses[currentVerse]);
           setTimeout(() => {
             currentVerse++;
             if (currentVerse < verses.length) {
@@ -111,12 +112,18 @@
               document.getElementById("message").style.display = "none";
               document.getElementById("completion").style.display = "block";
             }
-          }, 1500);
+          }, 3000);
         }
       } else {
         btn.style.backgroundColor = "red";
         setTimeout(() => btn.style.backgroundColor = "#007bff", 500);
       }
+    }
+
+    function speakVerse(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'el-GR';
+      speechSynthesis.speak(utterance);
     }
 
     // Start the game
