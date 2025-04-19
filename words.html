@@ -128,6 +128,26 @@
       pointer-events: none;
       z-index: 9;
     }
+
+    #navigation {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 400px;
+      margin-top: 1rem;
+    }
+
+    .arrow {
+      font-size: 24px;
+      cursor: pointer;
+      color: #2196f3;
+      user-select: none;
+    }
+
+    .arrow.disabled {
+      color: #ccc;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -136,6 +156,11 @@
 <div id="progress"></div>
 <button id="toggleTranslation">Show English</button>
 <div id="grid"></div>
+
+<div id="navigation">
+  <span id="backArrow" class="arrow disabled">&#8592; Back</span>
+  <span id="forwardArrow" class="arrow">&#8594; Next</span>
+</div>
 
 <!-- Modal -->
 <div id="modal">
@@ -194,6 +219,8 @@
   const modal = document.getElementById('modal');
   const playAgainButton = document.getElementById('playAgain');
   const toggleTranslation = document.getElementById('toggleTranslation');
+  const backArrow = document.getElementById('backArrow');
+  const forwardArrow = document.getElementById('forwardArrow');
   const canvas = document.getElementById('confettiCanvas');
   const ctx = canvas.getContext('2d');
   let confetti = [];
@@ -230,6 +257,9 @@
       cell.addEventListener('click', () => handleClick(cell, letter, word));
       grid.appendChild(cell);
     });
+
+    backArrow.classList.toggle('disabled', currentChunk === 0);
+    forwardArrow.classList.toggle('disabled', currentChunk === totalChunks - 1);
   }
 
   function handleClick(cell, letter, word) {
@@ -253,6 +283,20 @@
       setTimeout(() => showChunk(currentChunk), 600);
     }
   }
+
+  backArrow.onclick = () => {
+    if (currentChunk > 0) {
+      currentChunk--;
+      showChunk(currentChunk);
+    }
+  };
+
+  forwardArrow.onclick = () => {
+    if (currentChunk < Math.ceil(punjabiAlphabet.length / chunkSize) - 1) {
+      currentChunk++;
+      showChunk(currentChunk);
+    }
+  };
 
   toggleTranslation.onclick = () => {
     showEnglish = !showEnglish;
